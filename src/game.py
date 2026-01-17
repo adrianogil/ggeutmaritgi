@@ -1,5 +1,7 @@
 import json
 import os
+import readline
+import sys
 
 
 class Game:
@@ -33,15 +35,37 @@ class Game:
     def play(self):
         next_prompt = "끝말잇기"
         last_word = None
+        exit_commands = {"quit", "exit", "q"}
+        help_text = (
+            "Type a Korean word that starts with the last character of the previous word.\n"
+            "Press Enter on an empty line or type 'q', 'quit', or 'exit' to leave the game."
+        )
+
+        print("Welcome to 끝말잇기 (word chain game)!")
+        print("Rules: Each word must start with the last character of the previous word.")
+        print(help_text)
 
         while True:
-            player_word = input(f"{next_prompt}\n>").strip()
+            sys.stdout.write(f"{next_prompt}\n> ")
+            sys.stdout.flush()
+            player_word = sys.stdin.readline().strip()
 
             if player_word == "":
                 print("Game Over!")
                 return
 
+            lower_word = player_word.lower()
+            if lower_word in exit_commands:
+                print("Goodbye!")
+                return
+
+            if lower_word in {"help", "h", "?"}:
+                print(help_text)
+                continue
+
             if last_word and player_word[0] != last_word["word"][-1]:
+                print("That word does not start with the correct character.")
+                print("Tip: Use the last character of the previous word.")
                 print("Game Over!")
                 return
 
@@ -49,6 +73,7 @@ class Game:
 
             next_word = self.find_word(player_word)
             if not next_word:
+                print("Great job! I couldn't find a word to continue.")
                 print("You win!")
                 return
 
