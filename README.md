@@ -7,7 +7,8 @@ your input. If you can stump the game, you win.
 ## Features
 
 - Simple terminal gameplay.
-- Uses a curated word list from `data/wordlist.txt`.
+- Uses a curated word list with meanings from `data/wordlist.json`.
+- Shows the meaning of each word after it is played.
 - One-command launch via a shell alias (see installation notes).
 
 ## Requirements
@@ -51,7 +52,7 @@ Or using the alias (after sourcing `bashrc.sh`):
 
 ```
 .
-├── data/wordlist.txt   # Word list used by the game
+├── data/wordlist.json  # Word list with meanings used by the game
 └── src
     ├── game.py         # Game logic and CLI loop
     ├── bashrc.sh       # Convenience alias

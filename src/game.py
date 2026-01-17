@@ -1,50 +1,63 @@
+import json
 import os
+
 
 class Game:
     def __init__(self):
-        self.wordlist_file = os.environ["GGEUTMARITGI_DIR"] + '/../data/wordlist.txt'
+        self.wordlist_file = os.path.join(
+            os.environ["GGEUTMARITGI_DIR"], "..", "data", "wordlist.json"
+        )
         self.load_wordlist()
 
     def load_wordlist(self):
+        with open(self.wordlist_file, "r", encoding="utf-8") as f:
+            wordlist_entries = json.load(f)
 
-        with open(self.wordlist_file, 'r') as f:
-            wordlist_lines = f.readlines()
-
-        wordlist = []
-
-        for w in wordlist_lines:
-            wordlist.append(w.strip())
-
-        self.wordlist = wordlist
-
+        self.wordlist = wordlist_entries
+        self.word_meanings = {entry["word"]: entry["meaning"] for entry in wordlist_entries}
 
     def find_word(self, word):
-        for w in self.wordlist:
-            if w[0] == word[len(word)-1]:
-                return w
+        last_char = word[-1]
+        for entry in self.wordlist:
+            if entry["word"][0] == last_char:
+                return entry
+        return None
+
+    def describe_word(self, word):
+        meaning = self.word_meanings.get(word)
+        if meaning:
+            print(f"Meaning: {meaning}")
+        else:
+            print("Meaning: (unknown)")
 
     def play(self):
-        next_word = "끝말잇기\n"
+        next_prompt = "끝말잇기"
+        last_word = None
 
-        is_playing = True
+        while True:
+            player_word = input(f"{next_prompt}\n>").strip()
 
-        game_turns = 0
+            if player_word == "":
+                print("Game Over!")
+                return
 
-        while is_playing:
-            player_word = input(next_word + "\n>")
+            if last_word and player_word[0] != last_word["word"][-1]:
+                print("Game Over!")
+                return
 
-            if game_turns > 0 and \
-                (player_word.strip() == "" or player_word[0] != next_word[len(next_word)-1]):
-                print('Game Over!')
-                exit(0)
+            self.describe_word(player_word)
 
             next_word = self.find_word(player_word)
+            if not next_word:
+                print("You win!")
+                return
 
-            is_playing = next_word is not None
+            print(f"Game: {next_word['word']}")
+            print(f"Meaning: {next_word['meaning']}")
 
-        print('You win!')
+            last_word = next_word
+            next_prompt = next_word["word"]
+
 
 game = Game()
 game.play()
-
-
